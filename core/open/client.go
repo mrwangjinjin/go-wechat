@@ -118,6 +118,14 @@ func (self *Client) ApiCreatePreAuthCode() (string, error) {
 
 // ApiQueryAuth 使用授权码换取公众号或小程序的接口调用凭据和授权信息
 func (self *Client) ApiQueryAuth(code string) (map[string]interface{}, error) {
+	exist := self.Cache.Exists(AuthorizerTokenCacheKeyPrefix + self.AppId)
+	if !exist {
+		authorizerToken, err := self.getRawApiQueryAuth(code)
+		if err != nil {
+			return authorizerToken, err
+		}
+		return authorizerToken, nil
+	}
 	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
 		return nil, err
