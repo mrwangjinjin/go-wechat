@@ -151,7 +151,7 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	authorizerToken := util.JsonUnmarshalBytes(body)
 	authorzationInfo := authorizerToken["authorization_info"].(map[string]interface{})
 	authorzationInfo["expires_in"] = time.Now().Unix() + 7200
-	err = self.Cache.Set(AuthorizerTokenCacheKeyPrefix+self.AppId, authorzationInfo)
+	err = self.Cache.Setex(AuthorizerTokenCacheKeyPrefix+self.AppId, authorzationInfo, 7200)
 	if err != nil {
 		return nil, err
 	}
