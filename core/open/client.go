@@ -89,7 +89,7 @@ func (self *Client) RefreshToken() (map[string]interface{}, error) {
 	authorizerToken["authorizer_access_token"] = authorizerRefreshToken["authorizer_access_token"]
 	authorizerToken["authorizer_refresh_token"] = authorizerRefreshToken["authorizer_refresh_token"]
 	authorizerToken["expires_in"] = time.Now().Unix() + 7200
-	_ = self.Cache.Set(AuthorizerTokenCacheKeyPrefix+self.AppId, authorizerToken)
+	_ = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+self.AppId, authorizerToken, 7200)
 	return util.JsonUnmarshalBytes(body), nil
 }
 
@@ -151,7 +151,7 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	authorizerToken := util.JsonUnmarshalBytes(body)
 	authorzationInfo := authorizerToken["authorization_info"].(map[string]interface{})
 	authorzationInfo["expires_in"] = time.Now().Unix() + 7200
-	err = self.Cache.Setex(AuthorizerTokenCacheKeyPrefix+self.AppId, authorzationInfo, 7200)
+	err = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+self.AppId, authorzationInfo, 7200)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (self *Client) getRawApiComponentToken() (map[string]interface{}, error) {
 	}
 	componentToken := util.JsonUnmarshalBytes(body)
 	componentToken["expires_in"] = time.Now().Unix() + 7200
-	_ = self.Cache.Setex(ComponentTokenCacheKeyPrefix+self.AppId, componentToken, 7200)
+	_ = self.Cache.SetEx(ComponentTokenCacheKeyPrefix+self.AppId, componentToken, 7200)
 	return componentToken, nil
 }
 
