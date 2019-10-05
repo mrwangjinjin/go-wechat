@@ -199,7 +199,7 @@ func (self *Client) getRawApiComponentToken() (map[string]interface{}, error) {
 	}
 	componentToken := util.JsonUnmarshalBytes(body)
 	componentToken["expires_in"] = time.Now().Unix() + 7200
-	_ = self.Cache.Set(ComponentTokenCacheKeyPrefix+self.AppId, componentToken)
+	_ = self.Cache.Setex(ComponentTokenCacheKeyPrefix+self.AppId, componentToken, 7200)
 	return componentToken, nil
 }
 
