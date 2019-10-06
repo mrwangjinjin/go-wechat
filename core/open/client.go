@@ -168,6 +168,28 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	return util.JsonUnmarshalBytes(body), nil
 }
 
+// ApiAuthorizerInfo 获取授权方的帐号基本信息
+func (self *Client) ApiAuthorizerInfo(authorizerAppId string) (map[string]interface{}, error) {
+	dst, err := json.Marshal(map[string]interface{}{
+		"component_appid":  self.AppId,
+		"authorizer_appid": authorizerAppId,
+	})
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return nil, err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.ApiQueryAuth(token), "application/json", dst)
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	authorizerToken := util.JsonUnmarshalBytes(body)
+	authorizerInfo := authorizerToken["authorizer_info"].(map[string]interface{})
+	return authorizerInfo, nil
+}
+
 // ApiComponentToken 获取第三方平台component_access_token
 func (self *Client) ApiComponentToken() (string, error) {
 	exist := self.Cache.Exists(ComponentTokenCacheKeyPrefix + self.AppId)

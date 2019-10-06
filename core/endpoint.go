@@ -32,6 +32,10 @@ func (self *Endpoint) ApiAuthorizerToken(componentToken string) string {
 	return fmt.Sprintf("%s/cgi-bin/component/api_authorizer_token?component_access_token=%s", self.baseUrl, componentToken)
 }
 
+func (self *Endpoint) ApiAuthorizerInfo(componentToken string) string {
+	return fmt.Sprintf("%s/cgi-bin/component/api_get_authorizer_info?component_access_token=%s", self.baseUrl, componentToken)
+}
+
 func (self *Endpoint) FastRegisterWeapp(componentToken string) string {
 	return fmt.Sprintf("%s/cgi-bin/component/fastregisterweapp?action=create&component_access_token=%s", self.baseUrl, componentToken)
 }
