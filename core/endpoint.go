@@ -64,6 +64,10 @@ func (self *Endpoint) Release(componentToken string) string {
 	return fmt.Sprintf("%s/wxa/release?access_token=%s", self.baseUrl, componentToken)
 }
 
+func (self *Endpoint) GetWxaCode(componentToken string) string {
+	return fmt.Sprintf("%s/wxa/getwxacode?access_token=%s", self.baseUrl, componentToken)
+}
+
 func (self *Endpoint) CustomService(componentToken string) string {
 	return fmt.Sprintf("%s/cgi-bin/message/custom/send?access_token=%s", self.baseUrl, componentToken)
 }

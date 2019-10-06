@@ -395,3 +395,24 @@ func (self *Client) Release(data map[string]interface{}) error {
 	}
 	return nil
 }
+
+// GetWxaCode 小程序码
+func (self *Client) GetWxaCode(data map[string]interface{}) ([]byte, error) {
+	dst, err := json.Marshal(data)
+	token, err := self.GetToken()
+	if err != nil {
+		return nil, err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.GetWxaCode(token["authorizer_access_token"].(string)), "application/json", dst)
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	if _, ok := resp["errcode"]; ok {
+		return nil, errors.New("操作失败")
+	}
+	return body, nil
+}
