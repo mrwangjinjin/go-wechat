@@ -333,6 +333,48 @@ func (self *Client) CommitCode(data map[string]interface{}) error {
 	return nil
 }
 
+// SubmitAudit 提交审核
+func (self *Client) SubmitAudit(data map[string]interface{}) error {
+	dst, err := json.Marshal(data)
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(token), "application/json", dst)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	if resp["errcode"].(int64) != 0 {
+		return errors.New("操作失败")
+	}
+	return nil
+}
+
+// UndoCodeAudit 审核撤回
+func (self *Client) UndoCodeAudit(data map[string]interface{}) error {
+	dst, err := json.Marshal(data)
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(token), "application/json", dst)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	if resp["errcode"].(int64) != 0 {
+		return errors.New("操作失败")
+	}
+	return nil
+}
+
 // Release 小程序发布
 func (self *Client) Release(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)

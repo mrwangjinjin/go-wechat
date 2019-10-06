@@ -1,3 +1,3 @@
 .idea
 .settings
-./go.sum
+go.sum

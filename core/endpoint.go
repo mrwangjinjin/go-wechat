@@ -52,6 +52,14 @@ func (self *Endpoint) CommitCode(componentToken string) string {
 	return fmt.Sprintf("%s/wxa/commit?access_token=%s", self.baseUrl, componentToken)
 }
 
+func (self *Endpoint) SubmitAudit(componentToken string) string {
+	return fmt.Sprintf("%s/wxa/submit_audit?access_token=%s", self.baseUrl, componentToken)
+}
+
+func (self *Endpoint) UndoCodeAudit(componentToken string) string {
+	return fmt.Sprintf("%s/wxa/undocodeaudit?access_token=%s", self.baseUrl, componentToken)
+}
+
 func (self *Endpoint) Release(componentToken string) string {
 	return fmt.Sprintf("%s/wxa/release?access_token=%s", self.baseUrl, componentToken)
 }
