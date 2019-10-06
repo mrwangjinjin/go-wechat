@@ -178,7 +178,7 @@ func (self *Client) ApiAuthorizerInfo(authorizerAppId string) (map[string]interf
 	if err != nil {
 		return nil, err
 	}
-	status, body, err := self.Http.Post(self.Endpoint.ApiQueryAuth(token), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.ApiAuthorizerInfo(token), "application/json", dst)
 	if err != nil {
 		return nil, err
 	}
