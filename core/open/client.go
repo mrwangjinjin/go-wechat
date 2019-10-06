@@ -65,7 +65,7 @@ func (self *Client) GetToken() (map[string]interface{}, error) {
 }
 
 // RefreshToken
-func (self *Client) RefreshToken() (map[string]interface{}, error) {
+func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[string]interface{}, error) {
 	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
 		return nil, err
@@ -73,8 +73,8 @@ func (self *Client) RefreshToken() (map[string]interface{}, error) {
 	authorizerToken := util.JsonUnmarshalBytes(resp)
 	dst, err := json.Marshal(map[string]interface{}{
 		"component_appid":          self.AppId,
-		"authorizer_appid":         self.AppSecret,
-		"authorizer_refresh_token": self.getComponentTicket(),
+		"authorizer_appid":         authorizerAppId,
+		"authorizer_refresh_token": refreshToken,
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
@@ -265,6 +265,29 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 		return errors.New("注册失败")
 	}
 
+	return nil
+}
+
+// BindTester 绑定体验者账号
+func (self *Client) BindTester(wechatId string) error {
+	dst, err := json.Marshal(map[string]interface{}{
+		"wechatid": wechatId,
+	})
+	token, err := self.GetToken()
+	if err != nil {
+		return err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.BindTester(token["authorizer_access_token"].(string)), "application/json", dst)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	if resp["errcode"].(int64) != 0 {
+		return errors.New("操作失败")
+	}
 	return nil
 }
 
