@@ -188,7 +188,7 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 		sentry.CaptureException(err)
 		return nil, err
 	}
-	return util.JsonUnmarshalBytes(body), nil
+	return authorzationInfo, nil
 }
 
 // ApiAuthorizerInfo 获取授权方的帐号基本信息
