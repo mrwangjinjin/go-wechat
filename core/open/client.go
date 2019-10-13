@@ -17,8 +17,6 @@ const (
 	AuthorizerTokenCacheKeyPrefix = "CACHE_AUTHORIZER_TOKEN@@"
 )
 
-//
-
 type Client struct {
 	Http      *core.HttpClient
 	Endpoint  *core.Endpoint
