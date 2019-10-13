@@ -54,8 +54,8 @@ func (self *Client) GetAuthUrl(redirectUri string, authType uint8) string {
 }
 
 // GetToken
-func (self *Client) GetToken() (map[string]interface{}, error) {
-	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
+func (self *Client) GetToken(authorizerAppId string) (map[string]interface{}, error) {
+	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + authorizerAppId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (self *Client) GetToken() (map[string]interface{}, error) {
 
 // RefreshToken
 func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[string]interface{}, error) {
-	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
+	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + authorizerAppId)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[stri
 	authorizerToken["authorizer_access_token"] = authorizerRefreshToken["authorizer_access_token"]
 	authorizerToken["authorizer_refresh_token"] = authorizerRefreshToken["authorizer_refresh_token"]
 	authorizerToken["expires_in"] = time.Now().Unix() + 7200
-	_ = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+self.AppId, authorizerToken, 7200)
+	_ = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorizerAppId, authorizerToken, 7200)
 	return util.JsonUnmarshalBytes(body), nil
 }
 
@@ -116,25 +116,9 @@ func (self *Client) ApiCreatePreAuthCode() (string, error) {
 
 // ApiQueryAuth 使用授权码换取公众号或小程序的接口调用凭据和授权信息
 func (self *Client) ApiQueryAuth(code string) (map[string]interface{}, error) {
-	exist := self.Cache.Exists(AuthorizerTokenCacheKeyPrefix + self.AppId)
-	if !exist {
-		authorizerToken, err := self.getRawApiQueryAuth(code)
-		if err != nil {
-			return authorizerToken, err
-		}
-		return authorizerToken, nil
-	}
-	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
+	authorizerToken, err := self.getRawApiQueryAuth(code)
 	if err != nil {
-		return nil, err
-	}
-	authorizerToken := util.JsonUnmarshalBytes(resp)
-	if time.Now().Unix() > int64(authorizerToken["expires_in"].(float64)) {
-		authorizerToken, err := self.getRawApiQueryAuth(code)
-		if err != nil {
-			return authorizerToken, err
-		}
-		return authorizerToken, nil
+		return authorizerToken, err
 	}
 	return authorizerToken, nil
 }
@@ -159,7 +143,7 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	authorizerToken := util.JsonUnmarshalBytes(body)
 	authorzationInfo := authorizerToken["authorization_info"].(map[string]interface{})
 	authorzationInfo["expires_in"] = time.Now().Unix() + 7200
-	err = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+self.AppId, authorzationInfo, 7200)
+	err = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorzationInfo["authorizer_appid"].(string), authorzationInfo, 7200)
 	if err != nil {
 		return nil, err
 	}
@@ -267,11 +251,11 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 }
 
 // BindTester 绑定体验者账号
-func (self *Client) BindTester(wechatId string) error {
+func (self *Client) BindTester(authorizerAppId, wechatId string) error {
 	dst, err := json.Marshal(map[string]interface{}{
 		"wechatid": wechatId,
 	})
-	token, err := self.GetToken()
+	token, err := self.GetToken(authorizerAppId)
 	if err != nil {
 		return err
 	}
@@ -395,9 +379,9 @@ func (self *Client) Release(data map[string]interface{}) error {
 }
 
 // GetWxaCode 小程序码
-func (self *Client) GetWxaCode(data map[string]interface{}) ([]byte, error) {
+func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface{}) ([]byte, error) {
 	dst, err := json.Marshal(data)
-	token, err := self.GetToken()
+	token, err := self.GetToken(authorizerAppId)
 	if err != nil {
 		return nil, err
 	}
