@@ -2,8 +2,6 @@ package core
 
 import (
 	"encoding/xml"
-	"errors"
-	"github.com/getsentry/sentry-go"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,12 +18,6 @@ const (
 	EventUnauthorized             = "unauthorized"
 	EventNotifyThirdFasteregister = "notify_third_fasteregister"
 )
-
-func init() {
-	sentry.Init(sentry.ClientOptions{
-		Dsn: "http://23f4952429544a4ea9fd98e9173a9443@sentry.lianyunapp.cn/15",
-	})
-}
 
 const (
 	AutoTestMpId = "wxd101a85aa106f53e"
@@ -68,13 +60,11 @@ func (self *Server) Serve(w http.ResponseWriter, r *http.Request) {
 		}
 		// 验证签名
 		if !decoder.VerifySignature(self.Token) {
-			sentry.CaptureException(errors.New("签名验证失败"))
 			return
 		}
 		// 解密消息
 		decryptMsg, err := decoder.DecodeComponentVerifyTicket(self.AppId, self.AesKey)
 		if err != nil {
-			sentry.CaptureException(err)
 			return
 		}
 
@@ -113,7 +103,6 @@ func (self *Server) ReadXML(r *http.Request) []byte {
 	}()
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		sentry.CaptureException(err)
 		return []byte{}
 	}
 	return body
@@ -138,13 +127,11 @@ func (self *Server) EventServe(w http.ResponseWriter, r *http.Request) {
 		}
 		// 验证签名
 		if !decoder.VerifySignature(self.Token) {
-			sentry.CaptureException(errors.New("签名验证失败"))
 			return
 		}
 		// 解密消息
 		decryptMsg, err := decoder.DecodeEventMessage(self.AppId, self.AesKey)
 		if err != nil {
-			sentry.CaptureException(err)
 			return
 		}
 
@@ -163,7 +150,6 @@ func (self *Server) EventServe(w http.ResponseWriter, r *http.Request) {
 func (self *Server) NewTextMessage(w http.ResponseWriter, text *Text) ([]byte, error) {
 	buf, err := xml.Marshal(text)
 	if err != nil {
-		sentry.CaptureException(err)
 		return nil, err
 	}
 	return buf, nil
