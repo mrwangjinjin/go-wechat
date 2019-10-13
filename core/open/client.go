@@ -4,12 +4,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"github.com/mrwangjinjin/go-wechat/core"
 	"github.com/mrwangjinjin/go-wechat/pkg/util"
 	"net/http"
 	"net/url"
 	"time"
 )
+
+func init() {
+	sentry.Init(sentry.ClientOptions{
+		Dsn: "http://23f4952429544a4ea9fd98e9173a9443@sentry.lianyunapp.cn/15",
+	})
+}
 
 const (
 	ComponentTicketCacheKeyPrefix = "CACHE_TICKET@@"
@@ -46,6 +53,7 @@ func NewClient(clientConfig *core.ClientConfig, cache core.Cache) *Client {
 func (self *Client) GetAuthUrl(redirectUri string, authType uint8) string {
 	preAuthCode, err := self.ApiCreatePreAuthCode()
 	if err != nil {
+		sentry.CaptureException(err)
 		return ""
 	}
 	return fmt.Sprintf("https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=%s&pre_auth_code=%s&redirect_uri=%s&auth_type=%d",
@@ -59,6 +67,7 @@ func (self *Client) GetAuthUrl(redirectUri string, authType uint8) string {
 func (self *Client) GetToken() (map[string]interface{}, error) {
 	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	return util.JsonUnmarshal(string(resp)), nil
@@ -68,6 +77,7 @@ func (self *Client) GetToken() (map[string]interface{}, error) {
 func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[string]interface{}, error) {
 	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	authorizerToken := util.JsonUnmarshalBytes(resp)
@@ -78,13 +88,16 @@ func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[stri
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ApiAuthorizerToken(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return nil, errors.New("网络错误")
 	}
 	authorizerRefreshToken := util.JsonUnmarshalBytes(body)
@@ -102,13 +115,16 @@ func (self *Client) ApiCreatePreAuthCode() (string, error) {
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return "", err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.PreAuthCodoUrl(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return "", err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureMessage("网络错误")
 		return "", errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
@@ -122,18 +138,21 @@ func (self *Client) ApiQueryAuth(code string) (map[string]interface{}, error) {
 	if !exist {
 		authorizerToken, err := self.getRawApiQueryAuth(code)
 		if err != nil {
+			sentry.CaptureException(err)
 			return authorizerToken, err
 		}
 		return authorizerToken, nil
 	}
 	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	authorizerToken := util.JsonUnmarshalBytes(resp)
 	if time.Now().Unix() > int64(authorizerToken["expires_in"].(float64)) {
 		authorizerToken, err := self.getRawApiQueryAuth(code)
 		if err != nil {
+			sentry.CaptureException(err)
 			return authorizerToken, err
 		}
 		return authorizerToken, nil
@@ -149,13 +168,16 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ApiQueryAuth(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureMessage("网络错误")
 		return nil, errors.New("网络错误")
 	}
 	authorizerToken := util.JsonUnmarshalBytes(body)
@@ -163,6 +185,7 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	authorzationInfo["expires_in"] = time.Now().Unix() + 7200
 	err = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+self.AppId, authorzationInfo, 7200)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	return util.JsonUnmarshalBytes(body), nil
@@ -176,16 +199,22 @@ func (self *Client) ApiAuthorizerInfo(authorizerAppId string) (map[string]interf
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ApiAuthorizerInfo(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return nil, errors.New("网络错误")
 	}
 	authorizerToken := util.JsonUnmarshalBytes(body)
+	if authorizerToken == nil {
+		sentry.CaptureException(errors.New("ApiAuthorizerInfo：数据包不正确"))
+	}
 	authorizerInfo := authorizerToken["authorizer_info"].(map[string]interface{})
 	return authorizerInfo, nil
 }
@@ -196,18 +225,21 @@ func (self *Client) ApiComponentToken() (string, error) {
 	if !exist {
 		componentToken, err := self.getRawApiComponentToken()
 		if err != nil {
+			sentry.CaptureException(err)
 			return "", err
 		}
 		return componentToken["component_access_token"].(string), nil
 	}
 	resp, err := self.Cache.Get(ComponentTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
+		sentry.CaptureException(err)
 		return "", err
 	}
 	componentToken := util.JsonUnmarshalBytes(resp)
 	if time.Now().Unix() > int64(componentToken["expires_in"].(float64)) {
 		componentToken, err := self.getRawApiComponentToken()
 		if err != nil {
+			sentry.CaptureException(err)
 			return "", err
 		}
 		return componentToken["component_access_token"].(string), nil
@@ -224,9 +256,11 @@ func (self *Client) getRawApiComponentToken() (map[string]interface{}, error) {
 	})
 	status, body, err := self.Http.Post(self.Endpoint.ComponentAccessTokenUrl(), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	componentToken := util.JsonUnmarshalBytes(body)
@@ -239,6 +273,7 @@ func (self *Client) getRawApiComponentToken() (map[string]interface{}, error) {
 func (self *Client) getComponentTicket() (ticket string) {
 	exist := self.Cache.Exists(ComponentTicketCacheKeyPrefix + self.AppId)
 	if !exist {
+		sentry.CaptureMessage(ComponentTicketCacheKeyPrefix + self.AppId + "缓存未命中")
 		return ""
 	}
 	resp, _ := self.Cache.Get(ComponentTicketCacheKeyPrefix + self.AppId)
@@ -251,17 +286,21 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.FastRegisterWeapp(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("注册失败")
 	}
 
@@ -275,17 +314,21 @@ func (self *Client) BindTester(wechatId string) error {
 	})
 	token, err := self.GetToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.BindTester(token["authorizer_access_token"].(string)), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("操作失败")
 	}
 	return nil
@@ -296,17 +339,21 @@ func (self *Client) ModifyDomain(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ModifyDomain(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("操作失败")
 	}
 	return nil
@@ -317,17 +364,21 @@ func (self *Client) CommitCode(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.CommitCode(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("操作失败")
 	}
 	return nil
@@ -338,17 +389,21 @@ func (self *Client) SubmitAudit(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("操作失败")
 	}
 	return nil
@@ -359,17 +414,21 @@ func (self *Client) UndoCodeAudit(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("操作失败")
 	}
 	return nil
@@ -380,17 +439,21 @@ func (self *Client) Release(data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.Release(token), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"].(int64) != 0 {
+		sentry.CaptureException(errors.New("接口错误"))
 		return errors.New("操作失败")
 	}
 	return nil
@@ -401,17 +464,21 @@ func (self *Client) GetWxaCode(data map[string]interface{}) ([]byte, error) {
 	dst, err := json.Marshal(data)
 	token, err := self.GetToken()
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.GetWxaCode(token["authorizer_access_token"].(string)), "application/json", dst)
 	if err != nil {
+		sentry.CaptureException(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
+		sentry.CaptureException(errors.New("网络错误"))
 		return nil, errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if _, ok := resp["errcode"]; ok {
+		sentry.CaptureException(errors.New("接口错误"))
 		return nil, errors.New("操作失败")
 	}
 	return body, nil
