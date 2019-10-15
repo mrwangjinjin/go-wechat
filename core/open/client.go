@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mrwangjinjin/go-wechat/core"
 	"github.com/mrwangjinjin/go-wechat/pkg/util"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -239,7 +240,8 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("注册失败:" + resp["errmsg"].(string))
 	}
 
@@ -263,7 +265,8 @@ func (self *Client) BindTester(authorizerAppId, wechatId string) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
@@ -280,7 +283,8 @@ func (self *Client) ModifyDomain(authorizerAccessToken string, data map[string]i
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
@@ -297,7 +301,8 @@ func (self *Client) CommitCode(authorizerAccessToken string, data map[string]int
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
@@ -314,7 +319,8 @@ func (self *Client) SubmitAudit(authorizerAccessToken string, data map[string]in
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
@@ -331,7 +337,8 @@ func (self *Client) UndoCodeAudit(authorizerAccessToken string, data map[string]
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
@@ -348,7 +355,8 @@ func (self *Client) Release(authorizerAccessToken string, data map[string]interf
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"] != 0 {
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
@@ -369,6 +377,7 @@ func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface
 		return nil, errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
 	if _, ok := resp["errcode"]; ok {
 		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
@@ -389,6 +398,7 @@ func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{
 		return nil, errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
 	if _, ok := resp["errcode"]; ok {
 		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
