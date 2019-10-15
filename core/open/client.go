@@ -400,7 +400,7 @@ func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface
 }
 
 // MpLogin 第三方授权小程序登录
-func (self *Client) MpLogin(authorizerAppId, code string) ([]byte, error) {
+func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{}, error) {
 	token, err := self.GetToken(authorizerAppId)
 	if err != nil {
 		return nil, err
@@ -416,5 +416,5 @@ func (self *Client) MpLogin(authorizerAppId, code string) ([]byte, error) {
 	if _, ok := resp["errcode"]; ok {
 		return nil, errors.New("操作失败")
 	}
-	return body, nil
+	return resp, nil
 }
