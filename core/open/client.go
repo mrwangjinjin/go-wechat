@@ -240,7 +240,7 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("注册失败")
+		return errors.New("注册失败:" + resp["errmsg"].(string))
 	}
 
 	return nil
@@ -264,7 +264,7 @@ func (self *Client) BindTester(authorizerAppId, wechatId string) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("操作失败")
+		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
 }
@@ -285,7 +285,7 @@ func (self *Client) ModifyDomain(data map[string]interface{}) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("操作失败")
+		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
 }
@@ -306,7 +306,7 @@ func (self *Client) CommitCode(data map[string]interface{}) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("操作失败")
+		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
 }
@@ -327,7 +327,7 @@ func (self *Client) SubmitAudit(data map[string]interface{}) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("操作失败")
+		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
 }
@@ -348,7 +348,7 @@ func (self *Client) UndoCodeAudit(data map[string]interface{}) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("操作失败")
+		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
 }
@@ -369,7 +369,7 @@ func (self *Client) Release(data map[string]interface{}) error {
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if resp["errcode"] != 0 {
-		return errors.New("操作失败")
+		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return nil
 }
@@ -390,7 +390,7 @@ func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if _, ok := resp["errcode"]; ok {
-		return nil, errors.New("操作失败")
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return body, nil
 }
@@ -410,7 +410,7 @@ func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{
 	}
 	resp := util.JsonUnmarshalBytes(body)
 	if _, ok := resp["errcode"]; ok {
-		return nil, errors.New("操作失败")
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return resp, nil
 }
