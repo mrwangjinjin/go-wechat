@@ -71,3 +71,7 @@ func (self *Endpoint) GetWxaCode(componentToken string) string {
 func (self *Endpoint) CustomService(componentToken string) string {
 	return fmt.Sprintf("%s/cgi-bin/message/custom/send?access_token=%s", self.baseUrl, componentToken)
 }
+
+func (self *Endpoint) JsCode2Session(authorizerAppId, code, componentAppId, componentToken string) string {
+	return fmt.Sprintf("%s/sns/component/jscode2session?appid=%s&js_code=%s&grant_type=authorization_code&component_appid=%s&component_access_token=%s", self.baseUrl, authorizerAppId, code, componentAppId, componentToken)
+}
