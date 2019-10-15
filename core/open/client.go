@@ -239,7 +239,7 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("注册失败")
 	}
 
@@ -263,7 +263,7 @@ func (self *Client) BindTester(authorizerAppId, wechatId string) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("操作失败")
 	}
 	return nil
@@ -284,7 +284,7 @@ func (self *Client) ModifyDomain(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("操作失败")
 	}
 	return nil
@@ -305,7 +305,7 @@ func (self *Client) CommitCode(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("操作失败")
 	}
 	return nil
@@ -326,7 +326,7 @@ func (self *Client) SubmitAudit(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("操作失败")
 	}
 	return nil
@@ -347,7 +347,7 @@ func (self *Client) UndoCodeAudit(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("操作失败")
 	}
 	return nil
@@ -368,7 +368,7 @@ func (self *Client) Release(data map[string]interface{}) error {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	if resp["errcode"].(int64) != 0 {
+	if resp["errcode"] != 0 {
 		return errors.New("操作失败")
 	}
 	return nil
