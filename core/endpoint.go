@@ -44,32 +44,32 @@ func (self *Endpoint) BindTester(componentToken string) string {
 	return fmt.Sprintf("%s/wxa/bind_tester?access_token=%s", self.baseUrl, componentToken)
 }
 
-func (self *Endpoint) ModifyDomain(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/modify_domain?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) ModifyDomain(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/modify_domain?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) CommitCode(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/commit?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) CommitCode(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/commit?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) SubmitAudit(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/submit_audit?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) SubmitAudit(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/submit_audit?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) UndoCodeAudit(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/undocodeaudit?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) UndoCodeAudit(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/undocodeaudit?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) Release(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/release?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) Release(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/release?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) GetWxaCode(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/getwxacode?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) GetWxaCode(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/getwxacode?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) CustomService(componentToken string) string {
-	return fmt.Sprintf("%s/cgi-bin/message/custom/send?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) CustomService(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/cgi-bin/message/custom/send?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
 func (self *Endpoint) JsCode2Session(authorizerAppId, code, componentAppId, componentToken string) string {

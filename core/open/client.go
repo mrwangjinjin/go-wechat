@@ -270,13 +270,9 @@ func (self *Client) BindTester(authorizerAppId, wechatId string) error {
 }
 
 // ModifyDomain 修改小程序服务器域名
-func (self *Client) ModifyDomain(data map[string]interface{}) error {
+func (self *Client) ModifyDomain(authorizerAccessToken string, data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
-	token, err := self.ApiComponentToken()
-	if err != nil {
-		return err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.ModifyDomain(token), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.ModifyDomain(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return err
 	}
@@ -291,13 +287,9 @@ func (self *Client) ModifyDomain(data map[string]interface{}) error {
 }
 
 // CommitCode 上传小程序代码
-func (self *Client) CommitCode(data map[string]interface{}) error {
+func (self *Client) CommitCode(authorizerAccessToken string, data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
-	token, err := self.ApiComponentToken()
-	if err != nil {
-		return err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.CommitCode(token), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.CommitCode(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return err
 	}
@@ -312,13 +304,9 @@ func (self *Client) CommitCode(data map[string]interface{}) error {
 }
 
 // SubmitAudit 提交审核
-func (self *Client) SubmitAudit(data map[string]interface{}) error {
+func (self *Client) SubmitAudit(authorizerAccessToken string, data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
-	token, err := self.ApiComponentToken()
-	if err != nil {
-		return err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(token), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return err
 	}
@@ -333,13 +321,9 @@ func (self *Client) SubmitAudit(data map[string]interface{}) error {
 }
 
 // UndoCodeAudit 审核撤回
-func (self *Client) UndoCodeAudit(data map[string]interface{}) error {
+func (self *Client) UndoCodeAudit(authorizerAccessToken string, data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
-	token, err := self.ApiComponentToken()
-	if err != nil {
-		return err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(token), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return err
 	}
@@ -354,13 +338,9 @@ func (self *Client) UndoCodeAudit(data map[string]interface{}) error {
 }
 
 // Release 小程序发布
-func (self *Client) Release(data map[string]interface{}) error {
+func (self *Client) Release(authorizerAccessToken string, data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
-	token, err := self.ApiComponentToken()
-	if err != nil {
-		return err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.Release(token), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.Release(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return err
 	}
