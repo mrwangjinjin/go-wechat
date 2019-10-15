@@ -396,8 +396,12 @@ func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface
 }
 
 // MpLogin 第三方授权小程序登录
-func (self *Client) MpLogin(authorizerAppId, code, authorizerAccessToken string) (map[string]interface{}, error) {
-	status, body, err := self.Http.Get(self.Endpoint.JsCode2Session(self.AppId, code, authorizerAppId, authorizerAccessToken))
+func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{}, error) {
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return nil, err
+	}
+	status, body, err := self.Http.Get(self.Endpoint.JsCode2Session(authorizerAppId, code, self.AppId, token))
 	if err != nil {
 		return nil, err
 	}
