@@ -70,26 +70,33 @@ func (self *Server) Serve(w http.ResponseWriter, r *http.Request) {
 
 		// 处理推送事件
 		switch decryptMsg.InfoType {
-		default:
-			fallthrough
 		case EventComponentVerifyTicket:
 			_ = self.Cache.SetEx(ComponentTicketCacheKeyPrefix+self.AppId, map[string]interface{}{
 				"component_verify_ticket": decryptMsg.ComponentVerifyTicket,
 			}, 60*10)
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("success"))
+			break
 		case EventAuthorized:
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("success"))
+			break
 		case EventUpdateAuthorized:
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("success"))
+			break
 		case EventUnauthorized:
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("success"))
+			break
 		case EventNotifyThirdFasteregister:
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("success"))
+			break
+		default:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte("success"))
+			break
 		}
 	case "raw":
 		return
