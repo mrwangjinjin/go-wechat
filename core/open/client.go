@@ -64,11 +64,6 @@ func (self *Client) GetToken(authorizerAppId string) (map[string]interface{}, er
 
 // RefreshToken
 func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[string]interface{}, error) {
-	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + authorizerAppId)
-	if err != nil {
-		return nil, err
-	}
-	authorizerToken := util.JsonUnmarshalBytes(resp)
 	dst, err := json.Marshal(map[string]interface{}{
 		"component_appid":          self.AppId,
 		"authorizer_appid":         authorizerAppId,
@@ -86,11 +81,12 @@ func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[stri
 		return nil, errors.New("网络错误")
 	}
 	authorizerRefreshToken := util.JsonUnmarshalBytes(body)
-	authorizerToken["authorizer_access_token"] = authorizerRefreshToken["authorizer_access_token"]
-	authorizerToken["authorizer_refresh_token"] = authorizerRefreshToken["authorizer_refresh_token"]
-	authorizerToken["expires_in"] = time.Now().Unix() + 7200
-	_ = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorizerAppId, authorizerToken, 7200)
-	return util.JsonUnmarshalBytes(body), nil
+	_ = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorizerAppId, map[string]interface{}{
+		"authorizer_access_token":  authorizerRefreshToken["authorizer_access_token"],
+		"authorizer_refresh_token": authorizerRefreshToken["authorizer_refresh_token"],
+		"expires_in":               time.Now().Unix() + 7200,
+	}, 7200)
+	return authorizerRefreshToken, nil
 }
 
 // ApiCreatePreAuthCode 获取预授权码
@@ -400,12 +396,8 @@ func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface
 }
 
 // MpLogin 第三方授权小程序登录
-func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{}, error) {
-	token, err := self.GetToken(authorizerAppId)
-	if err != nil {
-		return nil, err
-	}
-	status, body, err := self.Http.Get(self.Endpoint.JsCode2Session(self.AppId, code, authorizerAppId, token["authorizer_access_token"].(string)))
+func (self *Client) MpLogin(authorizerAppId, code, authorizerAccessToken string) (map[string]interface{}, error) {
+	status, body, err := self.Http.Get(self.Endpoint.JsCode2Session(self.AppId, code, authorizerAppId, authorizerAccessToken))
 	if err != nil {
 		return nil, err
 	}
