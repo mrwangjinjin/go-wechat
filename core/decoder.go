@@ -36,6 +36,8 @@ type EventHeaderMessage struct {
 type EventMessage struct {
 	EventHeaderMessage
 	MsgId   int64  `xml:"MsgId"`
+	Event   string `xml:"Event"`
+	Reason  string `xml:"Reason"`
 	Content string `xml:"Content"`
 }
 
