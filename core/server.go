@@ -23,6 +23,8 @@ const (
 	AutoTestMpId = "wxd101a85aa106f53e"
 )
 
+type EventHandler func(interface{})
+
 type Server struct {
 	Cache     Cache
 	AppId     string
@@ -115,7 +117,7 @@ func (self *Server) ReadXML(r *http.Request) []byte {
 	return body
 }
 
-func (self *Server) EventServe(w http.ResponseWriter, r *http.Request) {
+func (self *Server) EventServe(w http.ResponseWriter, r *http.Request, eventHandler EventHandler) {
 	log.Println(r.URL.String())
 	encryptType := r.URL.Query().Get("encrypt_type")
 	if encryptType == "" {
@@ -142,14 +144,9 @@ func (self *Server) EventServe(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// 处理推送事件
-		switch decryptMsg.MsgType {
-		default:
-			fallthrough
-		case "text":
-
-		}
+		eventHandler(decryptMsg)
 	case "raw":
+		eventHandler(self.ReadXML(r))
 		return
 	}
 }

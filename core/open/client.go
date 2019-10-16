@@ -384,6 +384,23 @@ func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface
 	return body, nil
 }
 
+// GetLastAuditStatus 获取小程序最后一次审核状态
+func (self *Client) GetLastAuditStatus(authorizerAccessToken string) error {
+	status, body, err := self.Http.Get(self.Endpoint.GetLastAuditStatus(authorizerAccessToken))
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
+		return errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return nil
+}
+
 // MpLogin 第三方授权小程序登录
 func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{}, error) {
 	token, err := self.ApiComponentToken()
