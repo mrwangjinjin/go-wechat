@@ -23,7 +23,7 @@ const (
 	AutoTestMpId = "wxd101a85aa106f53e"
 )
 
-type EventHandler func(interface{})
+type EventHandler func(message *EventMessage)
 
 type Server struct {
 	Cache     Cache
@@ -144,9 +144,14 @@ func (self *Server) EventServe(w http.ResponseWriter, r *http.Request, eventHand
 			return
 		}
 
-		eventHandler(decryptMsg)
+		eventHandler(&decryptMsg)
 	case "raw":
-		eventHandler(self.ReadXML(r))
+		var eventMsg EventMessage
+		err := xml.Unmarshal(self.ReadXML(r), &eventMsg)
+		if err != nil {
+			return
+		}
+		eventHandler(&eventMsg)
 		return
 	}
 }
