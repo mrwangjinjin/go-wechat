@@ -249,15 +249,11 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 }
 
 // BindTester 绑定体验者账号
-func (self *Client) BindTester(authorizerAppId, wechatId string) error {
+func (self *Client) BindTester(authorizerAppId, authorizerAccessToken, wechatId string) error {
 	dst, err := json.Marshal(map[string]interface{}{
 		"wechatid": wechatId,
 	})
-	token, err := self.GetToken(authorizerAppId)
-	if err != nil {
-		return err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.BindTester(token["authorizer_access_token"].(string)), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.BindTester(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return err
 	}
@@ -398,8 +394,12 @@ func (self *Client) GetLastAuditStatus(authorizerAccessToken string) (map[string
 }
 
 // GetTemplateList 获取小程序代码模板
-func (self *Client) GetTemplateList(authorizerAccessToken string) (map[string]interface{}, error) {
-	status, body, err := self.Http.Get(self.Endpoint.GetTemplateList(authorizerAccessToken))
+func (self *Client) GetTemplateList() (map[string]interface{}, error) {
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return nil, err
+	}
+	status, body, err := self.Http.Get(self.Endpoint.GetTemplateList(token))
 	if err != nil {
 		return nil, err
 	}
