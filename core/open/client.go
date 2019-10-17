@@ -363,13 +363,9 @@ func (self *Client) Release(authorizerAccessToken string, data map[string]interf
 }
 
 // GetWxaCode 小程序码
-func (self *Client) GetWxaCode(authorizerAppId string, data map[string]interface{}) ([]byte, error) {
+func (self *Client) GetWxaCode(authorizerAppId, authorizerAccessToken string, data map[string]interface{}) ([]byte, error) {
 	dst, err := json.Marshal(data)
-	token, err := self.GetToken(authorizerAppId)
-	if err != nil {
-		return nil, err
-	}
-	status, body, err := self.Http.Post(self.Endpoint.GetWxaCode(token["authorizer_access_token"].(string)), "application/json", dst)
+	status, body, err := self.Http.Post(self.Endpoint.GetWxaCode(authorizerAccessToken), "application/json", dst)
 	if err != nil {
 		return nil, err
 	}
