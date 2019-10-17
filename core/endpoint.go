@@ -79,3 +79,7 @@ func (self *Endpoint) GetLastAuditStatus(authorizerAccessToken string) string {
 func (self *Endpoint) JsCode2Session(authorizerAppId, code, componentAppId, componentToken string) string {
 	return fmt.Sprintf("%s/sns/component/jscode2session?appid=%s&js_code=%s&grant_type=authorization_code&component_appid=%s&component_access_token=%s", self.baseUrl, authorizerAppId, code, componentAppId, componentToken)
 }
+
+func (self *Endpoint) GetTemplateList(componentToken string) string {
+	return fmt.Sprintf("%s/wxa/gettemplatelist?access_token=%s", self.baseUrl, componentToken)
+}
