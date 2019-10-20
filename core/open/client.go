@@ -268,7 +268,7 @@ func (self *Client) BindTester(authorizerAppId, authorizerAccessToken, wechatId 
 	return nil
 }
 
-// BindTester 绑定体验者账号
+// UnbindTester 解除绑定体验者账号
 func (self *Client) UnbindTester(authorizerAppId, authorizerAccessToken, wechatId string) error {
 	dst, err := json.Marshal(map[string]interface{}{
 		"wechatid": wechatId,
