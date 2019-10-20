@@ -249,7 +249,7 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 }
 
 // BindTester 绑定体验者账号
-func (self *Client) BindTester(authorizerAppId, authorizerAccessToken, wechatId string) error {
+func (self *Client) BindTester(authorizerAccessToken, wechatId string) error {
 	dst, err := json.Marshal(map[string]interface{}{
 		"wechatid": wechatId,
 	})
@@ -269,7 +269,7 @@ func (self *Client) BindTester(authorizerAppId, authorizerAccessToken, wechatId 
 }
 
 // UnbindTester 解除绑定体验者账号
-func (self *Client) UnbindTester(authorizerAppId, authorizerAccessToken, wechatId string) error {
+func (self *Client) UnbindTester(authorizerAccessToken, wechatId string) error {
 	dst, err := json.Marshal(map[string]interface{}{
 		"wechatid": wechatId,
 	})
@@ -470,4 +470,21 @@ func (self *Client) GetQrCode(authorizerAccessToken, path string) ([]byte, error
 		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return body, nil
+}
+
+// MemberAuth 获取小程序所有已绑定的体验者列表
+func (self *Client) MemberAuth(authorizerAccessToken, path string) (map[string]interface{}, error) {
+	status, body, err := self.Http.Get(self.Endpoint.MemberAuth(authorizerAccessToken))
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if _, ok := resp["errcode"]; ok {
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return resp, nil
 }

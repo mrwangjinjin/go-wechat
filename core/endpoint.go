@@ -83,10 +83,14 @@ func (self *Endpoint) JsCode2Session(authorizerAppId, code, componentAppId, comp
 	return fmt.Sprintf("%s/sns/component/jscode2session?appid=%s&js_code=%s&grant_type=authorization_code&component_appid=%s&component_access_token=%s", self.baseUrl, authorizerAppId, code, componentAppId, componentToken)
 }
 
-func (self *Endpoint) GetTemplateList(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/gettemplatelist?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) GetTemplateList(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/gettemplatelist?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) GetQrCode(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/get_qrcode?access_token=%s&path=%s", self.baseUrl, componentToken)
+func (self *Endpoint) GetQrCode(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/get_qrcode?access_token=%s&path=%s", self.baseUrl, authorizerAccessToken)
+}
+
+func (self *Endpoint) MemberAuth(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s//wxa/memberauth?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
