@@ -40,8 +40,11 @@ func (self *Endpoint) FastRegisterWeapp(componentToken string) string {
 	return fmt.Sprintf("%s/cgi-bin/component/fastregisterweapp?action=create&component_access_token=%s", self.baseUrl, componentToken)
 }
 
-func (self *Endpoint) BindTester(componentToken string) string {
-	return fmt.Sprintf("%s/wxa/bind_tester?access_token=%s", self.baseUrl, componentToken)
+func (self *Endpoint) BindTester(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/bind_tester?access_token=%s", self.baseUrl, authorizerAccessToken)
+}
+func (self *Endpoint) UnbindTester(authorizerAccessToken string) string {
+	return fmt.Sprintf("%s/wxa/unbind_tester?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
 func (self *Endpoint) ModifyDomain(authorizerAccessToken string) string {
@@ -82,4 +85,8 @@ func (self *Endpoint) JsCode2Session(authorizerAppId, code, componentAppId, comp
 
 func (self *Endpoint) GetTemplateList(componentToken string) string {
 	return fmt.Sprintf("%s/wxa/gettemplatelist?access_token=%s", self.baseUrl, componentToken)
+}
+
+func (self *Endpoint) GetQrCode(componentToken string) string {
+	return fmt.Sprintf("%s/wxa/get_qrcode?access_token=%s&path=%s", self.baseUrl, componentToken)
 }

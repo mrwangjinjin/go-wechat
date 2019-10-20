@@ -268,6 +268,26 @@ func (self *Client) BindTester(authorizerAppId, authorizerAccessToken, wechatId 
 	return nil
 }
 
+// BindTester 绑定体验者账号
+func (self *Client) UnbindTester(authorizerAppId, authorizerAccessToken, wechatId string) error {
+	dst, err := json.Marshal(map[string]interface{}{
+		"wechatid": wechatId,
+	})
+	status, body, err := self.Http.Post(self.Endpoint.UnbindTester(authorizerAccessToken), "application/json", dst)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
+		return errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return nil
+}
+
 // ModifyDomain 修改小程序服务器域名
 func (self *Client) ModifyDomain(authorizerAccessToken string, data map[string]interface{}) error {
 	dst, err := json.Marshal(data)
@@ -359,7 +379,7 @@ func (self *Client) Release(authorizerAccessToken string, data map[string]interf
 }
 
 // GetWxaCode 小程序码
-func (self *Client) GetWxaCode(authorizerAppId, authorizerAccessToken string, data map[string]interface{}) ([]byte, error) {
+func (self *Client) GetWxaCode(authorizerAccessToken string, data map[string]interface{}) ([]byte, error) {
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.GetWxaCode(authorizerAccessToken), "application/json", dst)
 	if err != nil {
@@ -433,4 +453,21 @@ func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{
 		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return resp, nil
+}
+
+// GetQrCode 小程序体验码
+func (self *Client) GetQrCode(authorizerAccessToken, path string) ([]byte, error) {
+	status, body, err := self.Http.Get(self.Endpoint.GetQrCode(authorizerAccessToken))
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if _, ok := resp["errcode"]; ok {
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return body, nil
 }
