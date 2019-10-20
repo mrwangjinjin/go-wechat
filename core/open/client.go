@@ -474,7 +474,7 @@ func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{
 
 // GetQrCode 小程序体验码
 func (self *Client) GetQrCode(authorizerAccessToken, path string) ([]byte, error) {
-	status, body, err := self.Http.Get(self.Endpoint.GetQrCode(authorizerAccessToken))
+	status, body, err := self.Http.Get(self.Endpoint.GetQrCode(authorizerAccessToken, path))
 	if err != nil {
 		return nil, err
 	}

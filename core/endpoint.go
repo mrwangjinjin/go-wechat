@@ -87,7 +87,7 @@ func (self *Endpoint) GetTemplateList(authorizerAccessToken string) string {
 	return fmt.Sprintf("%s/wxa/gettemplatelist?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
-func (self *Endpoint) GetQrCode(authorizerAccessToken string) string {
+func (self *Endpoint) GetQrCode(authorizerAccessToken, path string) string {
 	return fmt.Sprintf("%s/wxa/get_qrcode?access_token=%s&path=%s", self.baseUrl, authorizerAccessToken)
 }
 
