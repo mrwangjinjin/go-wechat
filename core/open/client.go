@@ -489,6 +489,23 @@ func (self *Client) GetQrCode(authorizerAccessToken, path string) ([]byte, error
 	return body, nil
 }
 
+// GetQrCode 小程序体验码
+func (self *Client) GetQrCodeWithoutPath(authorizerAccessToken string) ([]byte, error) {
+	status, body, err := self.Http.Get(self.Endpoint.GetQrCodeWithoutPath(authorizerAccessToken))
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if _, ok := resp["errcode"]; ok {
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return body, nil
+}
+
 // MemberAuth 获取小程序所有已绑定的体验者列表
 func (self *Client) MemberAuth(authorizerAccessToken string) (map[string]interface{}, error) {
 	status, body, err := self.Http.Get(self.Endpoint.MemberAuth(authorizerAccessToken))
