@@ -434,6 +434,23 @@ func (self *Client) GetTemplateList() (map[string]interface{}, error) {
 	return resp, nil
 }
 
+// GetPage 获取已上传的代码的页面列表
+func (self *Client) GetPage(authorizerAccessToken string) (map[string]interface{}, error) {
+	status, body, err := self.Http.Get(self.Endpoint.GetPage(authorizerAccessToken))
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return resp, nil
+}
+
 // MpLogin 第三方授权小程序登录
 func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{}, error) {
 	token, err := self.ApiComponentToken()
