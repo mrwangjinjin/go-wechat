@@ -473,7 +473,7 @@ func (self *Client) GetQrCode(authorizerAccessToken, path string) ([]byte, error
 }
 
 // MemberAuth 获取小程序所有已绑定的体验者列表
-func (self *Client) MemberAuth(authorizerAccessToken, path string) (map[string]interface{}, error) {
+func (self *Client) MemberAuth(authorizerAccessToken string) (map[string]interface{}, error) {
 	status, body, err := self.Http.Get(self.Endpoint.MemberAuth(authorizerAccessToken))
 	if err != nil {
 		return nil, err
