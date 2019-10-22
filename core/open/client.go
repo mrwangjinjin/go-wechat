@@ -506,6 +506,26 @@ func (self *Client) GetQrCodeWithoutPath(authorizerAccessToken string) ([]byte, 
 	return body, nil
 }
 
+// GetWxaQrCode 小程序码
+func (self *Client) GetWxaQrCode(authorizerAccessToken, path string) ([]byte, error) {
+	dst, err := json.Marshal(map[string]interface{}{
+		"path": path,
+	})
+	status, body, err := self.Http.Post(self.Endpoint.CreateWxaQrCode(authorizerAccessToken), "application/json", dst)
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if _, ok := resp["errcode"]; ok {
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return body, nil
+}
+
 // MemberAuth 获取小程序所有已绑定的体验者列表
 func (self *Client) MemberAuth(authorizerAccessToken string) (map[string]interface{}, error) {
 	status, body, err := self.Http.Get(self.Endpoint.MemberAuth(authorizerAccessToken))
