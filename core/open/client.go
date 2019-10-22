@@ -519,6 +519,7 @@ func (self *Client) GetWxaQrCode(authorizerAccessToken, path string) ([]byte, er
 		return nil, errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
 	if _, ok := resp["errcode"]; ok {
 		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
