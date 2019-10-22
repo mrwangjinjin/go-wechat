@@ -506,7 +506,7 @@ func (self *Client) GetQrCodeWithoutPath(authorizerAccessToken string) ([]byte, 
 	return body, nil
 }
 
-// GetWxaQrCode 小程序码
+// GetWxaQrCode 生成带参数小程序码
 func (self *Client) GetWxaQrCode(authorizerAccessToken, path string) ([]byte, error) {
 	dst, err := json.Marshal(map[string]interface{}{
 		"path": path,
