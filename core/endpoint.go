@@ -96,7 +96,7 @@ func (self *Endpoint) GetQrCodeWithoutPath(authorizerAccessToken string) string 
 }
 
 func (self *Endpoint) CreateWxaQrCode(authorizerAccessToken string) string {
-	return fmt.Sprintf("%s/cgi-bin/wxaapp/createwxaqrcode?access_token==%s", self.baseUrl, authorizerAccessToken)
+	return fmt.Sprintf("%s/cgi-bin/wxaapp/createwxaqrcode?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
 
 func (self *Endpoint) MemberAuth(authorizerAccessToken string) string {
