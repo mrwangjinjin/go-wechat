@@ -543,3 +543,30 @@ func (self *Client) MemberAuth(authorizerAccessToken string) (map[string]interfa
 	}
 	return resp, nil
 }
+
+// OAuth2Authorize 获取服务号授权网址
+func (self *Client) OAuth2Authorize(authorizerApppId, redirectUrl string) string {
+	return self.Endpoint.OAuth2Authorize(authorizerApppId, url.QueryEscape(redirectUrl), self.AppId)
+}
+
+// OAuth2AccessToken 获取服务号授权信息
+func (self *Client) OAuth2AccessToken(authorizerApppId, code string) (map[string]interface{}, error) {
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return nil, err
+	}
+
+	status, body, err := self.Http.Get(self.Endpoint.OAuth2AccessToken(authorizerApppId, code, self.AppId, token))
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if _, ok := resp["errcode"]; ok {
+		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return resp, nil
+}

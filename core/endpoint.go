@@ -106,3 +106,11 @@ func (self *Endpoint) MemberAuth(authorizerAccessToken string) string {
 func (self *Endpoint) GetPage(authorizerAccessToken string) string {
 	return fmt.Sprintf("%s/wxa/get_page?access_token=%s", self.baseUrl, authorizerAccessToken)
 }
+
+func (self *Endpoint) OAuth2Authorize(authorizerAppId, redirectUrl, componentAppId string) string {
+	return fmt.Sprintf("%s/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=SCOPE&state=STATE&component_appid=%s#wechat_redirect", self.baseUrl, authorizerAppId, redirectUrl, componentAppId)
+}
+
+func (self *Endpoint) OAuth2AccessToken(authorizerAppId, code, componentAppId, componentAccessToken string) string {
+	return fmt.Sprintf("%s/sns/oauth2/component/access_token?appid=%s&code=%s&grant_type=authorization_code&component_appid=%s&component_access_token=%s", self.baseUrl, authorizerAppId, code, componentAppId, componentAccessToken)
+}
