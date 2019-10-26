@@ -114,3 +114,7 @@ func (self *Endpoint) OAuth2Authorize(authorizerAppId, redirectUrl, componentApp
 func (self *Endpoint) OAuth2AccessToken(authorizerAppId, code, componentAppId, componentAccessToken string) string {
 	return fmt.Sprintf("%s/sns/oauth2/component/access_token?appid=%s&code=%s&grant_type=authorization_code&component_appid=%s&component_access_token=%s", self.baseUrl, authorizerAppId, code, componentAppId, componentAccessToken)
 }
+
+func (self *Endpoint) OAuth2RefreshToken(authorizerAppId, componentAppId, componentAccessToken, refreshToken string) string {
+	return fmt.Sprintf("%s/sns/oauth2/component/refresh_token?appid=%s&grant_type=refresh_token&component_appid=%s&component_access_token=%s&refresh_token=%s", self.baseUrl, authorizerAppId, componentAppId, componentAccessToken, refreshToken)
+}

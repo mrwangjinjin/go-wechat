@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	ComponentTicketCacheKeyPrefix = "CACHE_TICKET@@"
-	ComponentTokenCacheKeyPrefix  = "CACHE_COMPONENT@@"
-	AuthorizerTokenCacheKeyPrefix = "CACHE_AUTHORIZER_TOKEN@@"
+	ComponentTicketCacheKeyPrefix   = "CACHE_TICKET@@"
+	ComponentTokenCacheKeyPrefix    = "CACHE_COMPONENT@@"
+	AuthorizerTokenCacheKeyPrefix   = "CACHE_AUTHORIZER_TOKEN@@"
+	MpAuthorizerTokenCacheKeyPrefix = "CACHE_AUTHORIZER_TOKEN_MP@@"
 )
 
 type Client struct {
@@ -569,4 +570,26 @@ func (self *Client) OAuth2AccessToken(authorizerApppId, code string) (map[string
 		return nil, errors.New("操作失败:" + resp["errmsg"].(string))
 	}
 	return resp, nil
+}
+
+// OAuth2RefreshToken
+func (self *Client) OAuth2RefreshToken(authorizerAppId, refreshToken string) (map[string]interface{}, error) {
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return nil, err
+	}
+	status, body, err := self.Http.Get(self.Endpoint.OAuth2RefreshToken(authorizerAppId, self.AppId, token, refreshToken))
+	if err != nil {
+		return nil, err
+	}
+	if status != http.StatusOK {
+		return nil, errors.New("网络错误")
+	}
+	authorizerRefreshToken := util.JsonUnmarshalBytes(body)
+	_ = self.Cache.SetEx(MpAuthorizerTokenCacheKeyPrefix+authorizerAppId, map[string]interface{}{
+		"authorizer_mp_access_token":  authorizerRefreshToken["authorizer_access_token"],
+		"authorizer_mp_refresh_token": authorizerRefreshToken["authorizer_refresh_token"],
+		"expires_in":                  time.Now().Unix() + 7200,
+	}, 7200)
+	return authorizerRefreshToken, nil
 }
