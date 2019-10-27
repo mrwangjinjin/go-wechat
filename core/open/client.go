@@ -593,3 +593,24 @@ func (self *Client) OAuth2RefreshToken(authorizerAppId, refreshToken string) (ma
 	}, 7200)
 	return authorizerRefreshToken, nil
 }
+
+// CustomService
+func (self *Client) CustomService(authorizerAccessToken string, data map[string]interface{}) error {
+	dst, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.CustomService(authorizerAccessToken), "", dst)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if _, ok := resp["errcode"]; ok {
+		return errors.New("操作失败:" + resp["errmsg"].(string))
+	}
+	return nil
+}
