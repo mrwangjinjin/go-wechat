@@ -20,10 +20,12 @@ const (
 )
 
 const (
-	AutoTestMpId = "wxd101a85aa106f53e"
+	AutoTestAppId = "wxd101a85aa106f53e"
+	AutoTestMpId  = "wx570bc396a51b8ff8"
 )
 
 type EventHandler func(message *EventMessage)
+type EventNotifyHandler func(message *NotifyMessage)
 
 type Server struct {
 	Cache     Cache
@@ -44,7 +46,7 @@ func NewServer(clientConfig *ClientConfig, cache Cache) *Server {
 }
 
 // Serve 处理事件推送
-func (self *Server) Serve(w http.ResponseWriter, r *http.Request) {
+func (self *Server) Serve(w http.ResponseWriter, r *http.Request, eventHandler EventNotifyHandler) {
 	encryptType := r.URL.Query().Get("encrypt_type")
 	if encryptType == "" {
 		return
@@ -69,6 +71,8 @@ func (self *Server) Serve(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return
 		}
+
+		log.Println(decryptMsg)
 
 		// 处理推送事件
 		switch decryptMsg.InfoType {
@@ -96,11 +100,19 @@ func (self *Server) Serve(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte("success"))
 			break
 		default:
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("success"))
+			eventHandler(&decryptMsg)
 			break
 		}
 	case "raw":
+		var eventMsg NotifyMessage
+		err := xml.Unmarshal(self.ReadXML(r), &eventMsg)
+		if err != nil {
+			return
+		}
+
+		log.Println(eventMsg)
+
+		eventHandler(&eventMsg)
 		return
 	}
 	return
@@ -143,6 +155,7 @@ func (self *Server) EventServe(w http.ResponseWriter, r *http.Request, eventHand
 		if err != nil {
 			return
 		}
+		log.Println(decryptMsg)
 
 		eventHandler(&decryptMsg)
 	case "raw":
@@ -151,6 +164,7 @@ func (self *Server) EventServe(w http.ResponseWriter, r *http.Request, eventHand
 		if err != nil {
 			return
 		}
+		log.Println(eventMsg)
 		eventHandler(&eventMsg)
 		return
 	}

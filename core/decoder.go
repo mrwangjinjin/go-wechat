@@ -45,6 +45,7 @@ type NotifyHeaderMessage struct {
 	XMLName    xml.Name `xml:"xml"`
 	AppId      string   `xml:"AppId"`
 	CreateTime int64    `xml:"CreateTime"`
+	MsgType    string   `xml:"MsgType"`
 	InfoType   string   `xml:"InfoType"`
 }
 
