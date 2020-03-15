@@ -59,6 +59,7 @@ func (self *Client) GetAuthUrl(redirectUri string, authType uint8) string {
 func (self *Client) GetToken(authorizerAppId string) (map[string]interface{}, error) {
 	resp, err := self.Cache.Get(AuthorizerTokenCacheKeyPrefix + authorizerAppId)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	return util.JsonUnmarshal(string(resp)), nil
@@ -73,10 +74,12 @@ func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[stri
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ApiAuthorizerToken(token), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
@@ -98,10 +101,12 @@ func (self *Client) ApiCreatePreAuthCode() (string, error) {
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.PreAuthCodoUrl(token), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 	if status != http.StatusOK {
@@ -116,6 +121,7 @@ func (self *Client) ApiCreatePreAuthCode() (string, error) {
 func (self *Client) ApiQueryAuth(code string) (map[string]interface{}, error) {
 	authorizerToken, err := self.getRawApiQueryAuth(code)
 	if err != nil {
+		log.Println(err)
 		return authorizerToken, err
 	}
 	return authorizerToken, nil
@@ -129,6 +135,7 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ApiQueryAuth(token), "application/json", dst)
@@ -156,10 +163,12 @@ func (self *Client) ApiAuthorizerInfo(authorizerAppId string) (map[string]interf
 	})
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Post(self.Endpoint.ApiAuthorizerInfo(token), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
@@ -176,12 +185,14 @@ func (self *Client) ApiComponentToken() (string, error) {
 	if !exist {
 		componentToken, err := self.getRawApiComponentToken()
 		if err != nil {
+			log.Println(err)
 			return "", err
 		}
 		return componentToken["component_access_token"].(string), nil
 	}
 	resp, err := self.Cache.Get(ComponentTokenCacheKeyPrefix + self.AppId)
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 	componentToken := util.JsonUnmarshal(resp)
@@ -191,6 +202,7 @@ func (self *Client) ApiComponentToken() (string, error) {
 	if time.Now().Unix() > int64(componentToken["expires_in"].(float64)) {
 		componentToken, err := self.getRawApiComponentToken()
 		if err != nil {
+			log.Println(err)
 			return "", err
 		}
 		return componentToken["component_access_token"].(string), nil
@@ -207,9 +219,11 @@ func (self *Client) getRawApiComponentToken() (map[string]interface{}, error) {
 	})
 	status, body, err := self.Http.Post(self.Endpoint.ComponentAccessTokenUrl(), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
+		log.Print(err)
 		return nil, err
 	}
 	componentToken := util.JsonUnmarshalBytes(body)
@@ -225,6 +239,8 @@ func (self *Client) getComponentTicket() (ticket string) {
 		return ""
 	}
 	resp, _ := self.Cache.Get(ComponentTicketCacheKeyPrefix + self.AppId)
+	log.Println(ticket)
+	log.Println(resp)
 	componentVerifyTicket := util.JsonUnmarshal(resp)
 	if componentVerifyTicket == nil {
 		return ""
@@ -262,13 +278,13 @@ func (self *Client) BindTester(authorizerAccessToken, wechatId string) error {
 	})
 	status, body, err := self.Http.Post(self.Endpoint.BindTester(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	if status != http.StatusOK {
 		return errors.New("网络错误")
 	}
 	resp := util.JsonUnmarshalBytes(body)
-	log.Println(resp)
 	if int(resp["errcode"].(float64)) != 0 {
 		return errors.New("操作失败:" + resp["errmsg"].(string))
 	}
@@ -300,6 +316,7 @@ func (self *Client) ModifyDomain(authorizerAccessToken string, data map[string]i
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.ModifyDomain(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	if status != http.StatusOK {
@@ -318,6 +335,7 @@ func (self *Client) CommitCode(authorizerAccessToken string, data map[string]int
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.CommitCode(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	if status != http.StatusOK {
@@ -336,6 +354,7 @@ func (self *Client) SubmitAudit(authorizerAccessToken string, data map[string]in
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	if status != http.StatusOK {
@@ -354,6 +373,7 @@ func (self *Client) UndoCodeAudit(authorizerAccessToken string, data map[string]
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.SubmitAudit(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	if status != http.StatusOK {
@@ -372,6 +392,7 @@ func (self *Client) Release(authorizerAccessToken string, data map[string]interf
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.Release(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	if status != http.StatusOK {
@@ -390,6 +411,7 @@ func (self *Client) GetWxaCode(authorizerAccessToken string, data map[string]int
 	dst, err := json.Marshal(data)
 	status, body, err := self.Http.Post(self.Endpoint.GetWxaCode(authorizerAccessToken), "application/json", dst)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
@@ -407,6 +429,7 @@ func (self *Client) GetWxaCode(authorizerAccessToken string, data map[string]int
 func (self *Client) GetLastAuditStatus(authorizerAccessToken string) (map[string]interface{}, error) {
 	status, body, err := self.Http.Get(self.Endpoint.GetLastAuditStatus(authorizerAccessToken))
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
@@ -424,10 +447,12 @@ func (self *Client) GetLastAuditStatus(authorizerAccessToken string) (map[string
 func (self *Client) GetTemplateList() (map[string]interface{}, error) {
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Get(self.Endpoint.GetTemplateList(token))
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
@@ -462,10 +487,12 @@ func (self *Client) GetPage(authorizerAccessToken string) (map[string]interface{
 func (self *Client) MpLogin(authorizerAppId, code string) (map[string]interface{}, error) {
 	token, err := self.ApiComponentToken()
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	status, body, err := self.Http.Get(self.Endpoint.JsCode2Session(authorizerAppId, code, self.AppId, token))
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if status != http.StatusOK {
