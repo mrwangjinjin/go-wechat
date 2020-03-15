@@ -1,6 +1,6 @@
 module github.com/mrwangjinjin/go-wechat
 
-go 1.12
+go 1.13
 
 require (
 	github.com/conetse/WXBizMsgCrypt v0.0.0-20180416085802-b5a6c8e8b043

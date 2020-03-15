@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"github.com/gomodule/redigo/redis"
+	"github.com/mrwangjinjin/go-wechat/pkg/util"
 	"time"
 )
 
@@ -10,7 +11,7 @@ import (
 type Cache interface {
 	Set(key string, val interface{}) error
 	SetEx(key string, val interface{}, expires int64) error
-	Get(key string) ([]byte, error)
+	Get(key string) (string, error)
 	Exists(key string) bool
 }
 
@@ -65,7 +66,7 @@ func (self *CacheDefault) Set(key string, val interface{}) error {
 		return err
 	}
 
-	_, err = conn.Do("SET", key, value)
+	_, err = conn.Do("SET", key, util.Base64Encoding(value))
 	if err != nil {
 		return err
 	}
@@ -84,7 +85,7 @@ func (self *CacheDefault) SetEx(key string, val interface{}, expires int64) erro
 		return err
 	}
 
-	_, err = conn.Do("SET", key, value)
+	_, err = conn.Do("SET", key, util.Base64Encoding(value))
 	if err != nil {
 		return err
 	}
@@ -97,18 +98,18 @@ func (self *CacheDefault) SetEx(key string, val interface{}, expires int64) erro
 	return nil
 }
 
-func (self *CacheDefault) Get(key string) (reply []byte, err error) {
+func (self *CacheDefault) Get(key string) (reply string, err error) {
 	conn := self.redis.Get()
 	defer func() {
 		_ = conn.Close()
 	}()
 
-	reply, err = redis.Bytes(conn.Do("GET", key))
+	result, err := redis.Bytes(conn.Do("GET", key))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return reply, nil
+	return util.Base64Decoding(result)
 }
 
 func (self *CacheDefault) Exists(key string) bool {

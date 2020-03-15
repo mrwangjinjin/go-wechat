@@ -184,7 +184,10 @@ func (self *Client) ApiComponentToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	componentToken := util.JsonUnmarshalBytes(resp)
+	componentToken := util.JsonUnmarshal(resp)
+	if componentToken != nil {
+		return "", err
+	}
 	if time.Now().Unix() > int64(componentToken["expires_in"].(float64)) {
 		componentToken, err := self.getRawApiComponentToken()
 		if err != nil {
@@ -222,7 +225,10 @@ func (self *Client) getComponentTicket() (ticket string) {
 		return ""
 	}
 	resp, _ := self.Cache.Get(ComponentTicketCacheKeyPrefix + self.AppId)
-	componentVerifyTicket := util.JsonUnmarshalBytes(resp)
+	componentVerifyTicket := util.JsonUnmarshal(resp)
+	if componentVerifyTicket != nil {
+		return ""
+	}
 	return string(componentVerifyTicket["component_verify_ticket"].(string))
 }
 
