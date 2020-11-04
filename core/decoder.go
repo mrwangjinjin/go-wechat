@@ -53,6 +53,8 @@ type NotifyMessage struct {
 	NotifyHeaderMessage
 	ComponentVerifyTicket string `xml:"ComponentVerifyTicket"`
 	AuthorizerAppid       string `xml:"AuthorizerAppid"`
+	AuthorizationCode     string `xml:"AuthorizationCode"`
+	PreAuthCode           string `xml:"PreAuthCode"`
 }
 
 type MessageDecoder struct {
