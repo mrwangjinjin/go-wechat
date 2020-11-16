@@ -77,9 +77,11 @@ func (self *Server) Serve(w http.ResponseWriter, r *http.Request, eventHandler E
 		// 处理推送事件
 		switch decryptMsg.InfoType {
 		case EventComponentVerifyTicket:
-			_ = self.Cache.SetEx(ComponentTicketCacheKeyPrefix+self.AppId, map[string]interface{}{
-				"component_verify_ticket": decryptMsg.ComponentVerifyTicket,
-			}, 60*10)
+			if !self.Cache.Exists(ComponentTicketCacheKeyPrefix + self.AppId) {
+				_ = self.Cache.SetEx(ComponentTicketCacheKeyPrefix+self.AppId, map[string]interface{}{
+					"component_verify_ticket": decryptMsg.ComponentVerifyTicket,
+				}, 3600*10)
+			}
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("success"))
 			break

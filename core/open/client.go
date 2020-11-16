@@ -89,8 +89,8 @@ func (self *Client) RefreshToken(authorizerAppId, refreshToken string) (map[stri
 	_ = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorizerAppId, map[string]interface{}{
 		"authorizer_access_token":  authorizerRefreshToken["authorizer_access_token"],
 		"authorizer_refresh_token": authorizerRefreshToken["authorizer_refresh_token"],
-		"expires_in":               time.Now().Unix() + 7200,
-	}, 7200)
+		"expires_in":               time.Now().Unix() + 6600,
+	}, 6600)
 	return authorizerRefreshToken, nil
 }
 
@@ -147,8 +147,8 @@ func (self *Client) getRawApiQueryAuth(code string) (map[string]interface{}, err
 	}
 	authorizerToken := util.JsonUnmarshalBytes(body)
 	authorzationInfo := authorizerToken["authorization_info"].(map[string]interface{})
-	authorzationInfo["expires_in"] = time.Now().Unix() + 7200
-	err = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorzationInfo["authorizer_appid"].(string), authorzationInfo, 7200)
+	authorzationInfo["expires_in"] = time.Now().Unix() + 6600
+	err = self.Cache.SetEx(AuthorizerTokenCacheKeyPrefix+authorzationInfo["authorizer_appid"].(string), authorzationInfo, 6600)
 	if err != nil {
 		return nil, err
 	}
@@ -227,8 +227,8 @@ func (self *Client) getRawApiComponentToken() (map[string]interface{}, error) {
 		return nil, err
 	}
 	componentToken := util.JsonUnmarshalBytes(body)
-	componentToken["expires_in"] = time.Now().Unix() + 7200
-	_ = self.Cache.SetEx(ComponentTokenCacheKeyPrefix+self.AppId, componentToken, 7200)
+	componentToken["expires_in"] = time.Now().Unix() + 6600
+	_ = self.Cache.SetEx(ComponentTokenCacheKeyPrefix+self.AppId, componentToken, 6600)
 	return componentToken, nil
 }
 
@@ -622,8 +622,8 @@ func (self *Client) OAuth2RefreshToken(authorizerAppId, refreshToken string) (ma
 	_ = self.Cache.SetEx(MpAuthorizerTokenCacheKeyPrefix+authorizerAppId, map[string]interface{}{
 		"authorizer_mp_access_token":  authorizerRefreshToken["authorizer_access_token"],
 		"authorizer_mp_refresh_token": authorizerRefreshToken["authorizer_refresh_token"],
-		"expires_in":                  time.Now().Unix() + 7200,
-	}, 7200)
+		"expires_in":                  time.Now().Unix() + 6600,
+	}, 6600)
 	return authorizerRefreshToken, nil
 }
 
