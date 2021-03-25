@@ -40,6 +40,10 @@ func (self *Endpoint) FastRegisterWeapp(componentToken string) string {
 	return fmt.Sprintf("%s/cgi-bin/component/fastregisterweapp?action=create&component_access_token=%s", self.baseUrl, componentToken)
 }
 
+func (self *Endpoint) FastRegisterWeappSearch(componentToken string) string {
+	return fmt.Sprintf("%s/cgi-bin/component/fastregisterweapp?action=search&component_access_token=%s", self.baseUrl, componentToken)
+}
+
 func (self *Endpoint) BindTester(authorizerAccessToken string) string {
 	return fmt.Sprintf("%s/wxa/bind_tester?access_token=%s", self.baseUrl, authorizerAccessToken)
 }

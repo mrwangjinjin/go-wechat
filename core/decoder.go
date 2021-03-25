@@ -49,12 +49,24 @@ type NotifyHeaderMessage struct {
 	InfoType   string   `xml:"InfoType"`
 }
 
+type InfoMessage struct {
+	XMLName            xml.Name `xml:"info"`
+	Name               int64    `xml:"name"`
+	Code               string   `xml:"code"`
+	CodeType           int      `xml:code_type`
+	LegalPersonaWechat string   `xml:"legal_persona_wechat"`
+	LegalPersonaName   string   `xml:"legal_persona_name"`
+	ComponentPhone     string   `xml:"component_phone"`
+}
+
 type NotifyMessage struct {
 	NotifyHeaderMessage
 	ComponentVerifyTicket string `xml:"ComponentVerifyTicket"`
 	AuthorizerAppid       string `xml:"AuthorizerAppid"`
 	AuthorizationCode     string `xml:"AuthorizationCode"`
 	PreAuthCode           string `xml:"PreAuthCode"`
+	Appid                 string `xml:"appid"`
+	InfoMessage
 }
 
 type MessageDecoder struct {

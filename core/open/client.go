@@ -271,6 +271,29 @@ func (self *Client) FastRegisterWeapp(data map[string]interface{}) error {
 	return nil
 }
 
+// FastRegisterWeappSearch 快速注册小程序结果查询
+func (self *Client) FastRegisterWeappSearch(data map[string]interface{}) error {
+	dst, err := json.Marshal(data)
+	token, err := self.ApiComponentToken()
+	if err != nil {
+		return err
+	}
+	status, body, err := self.Http.Post(self.Endpoint.FastRegisterWeappSearch(token), "application/json", dst)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return errors.New("网络错误")
+	}
+	resp := util.JsonUnmarshalBytes(body)
+	log.Println(resp)
+	if int(resp["errcode"].(float64)) != 0 {
+		return errors.New("注册失败:" + resp["errmsg"].(string))
+	}
+
+	return nil
+}
+
 // BindTester 绑定体验者账号
 func (self *Client) BindTester(authorizerAccessToken, wechatId string) error {
 	dst, err := json.Marshal(map[string]interface{}{
