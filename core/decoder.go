@@ -66,6 +66,8 @@ type NotifyMessage struct {
 	AuthorizationCode     string `xml:"AuthorizationCode"`
 	PreAuthCode           string `xml:"PreAuthCode"`
 	Appid                 string `xml:"appid"`
+	AuthCode              string `xml:"auth_code"`
+	Status                int    `xml:"status"`
 	InfoMessage
 }
 
