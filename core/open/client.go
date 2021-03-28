@@ -188,6 +188,9 @@ func (self *Client) ApiComponentToken() (string, error) {
 			log.Println(err)
 			return "", err
 		}
+		if _, ok := componentToken["component_access_token"]; !ok {
+			return "", errors.New("获取组件Token失败")
+		}
 		return componentToken["component_access_token"].(string), nil
 	}
 	resp, err := self.Cache.Get(ComponentTokenCacheKeyPrefix + self.AppId)
